@@ -1,26 +1,26 @@
 import Country from "../models/Country.js";
 
-export const getCountries = async (req, res) => {
+export const getCountries = async (req, res, next) => {
   try {
-    const countries = await Country.find();
+    const countries = await Country.find().sort("name");
     res.json(countries);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const createCountry = async (req, res) => {
+export const createCountry = async (req, res, next) => {
   const { name } = req.body;
 
   try {
     const newCountry = await Country.create({ name });
     res.status(201).json(newCountry);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const updateCountry = async (req, res) => {
+export const updateCountry = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -38,11 +38,11 @@ export const updateCountry = async (req, res) => {
       country: updatedCountry,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-export const deleteCountry = async (req, res) => {
+export const deleteCountry = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -55,6 +55,6 @@ export const deleteCountry = async (req, res) => {
     await Country.findByIdAndDelete(id);
     res.json({ message: "Country deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

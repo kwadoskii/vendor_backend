@@ -5,12 +5,13 @@ import {
   deleteCountry,
   updateCountry,
 } from "../controllers/countryController.js";
+import { authorize, protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getCountries);
-router.post("/", createCountry);
-router.put("/:id", updateCountry);
-router.delete("/:id", deleteCountry);
+router.get("/", protect, getCountries);
+router.post("/", createCountry, protect, authorize("admin"));
+router.put("/:id", protect, authorize("admin"), updateCountry);
+router.delete("/:id", protect, authorize("admin"), deleteCountry);
 
 export default router;
