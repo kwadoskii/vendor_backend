@@ -29,9 +29,7 @@ export const updateCountry = async (req, res, next) => {
       runValidators: true,
     });
 
-    if (!updatedCountry) {
-      return res.status(404).json({ message: "Country not found" });
-    }
+    if (!updatedCountry) return res.status(404).json({ message: "Country not found" });
 
     res.json({
       message: "Country updated successfully",

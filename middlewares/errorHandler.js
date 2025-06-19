@@ -19,8 +19,20 @@ const errorHandler = (err, req, res, next) => {
     errors = `The ${duplicatedField} "${err.keyValue[duplicatedField]}" is already in use.`;
   }
 
+  // Mongoose CastError (invalid ObjectId)
+  if (err.name === "CastError" && err.kind === "ObjectId") {
+    statusCode = 400;
+    message = "Invalid ID format";
+    errors = `The ID '${err.value}' is not a valid identifier for ${
+      err.model?.modelName || "resource"
+    }`;
+  }
+
   // Defaults to 500
-  res.status(statusCode).json({ message, errors });
+  res.status(statusCode).json({
+    message,
+    errors,
+  });
 };
 
 export default errorHandler;
