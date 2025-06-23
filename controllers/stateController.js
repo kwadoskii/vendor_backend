@@ -8,8 +8,8 @@ export const createState = async (req, res, next) => {
 
     // Optional: ensure country exists
     const countryExists = await Country.findById(country_id);
-    if (!countryExists) {
-      res.status(400).json({ error: "Invalid country ID" });
+    if (country_id && !countryExists) {
+      return res.status(400).json({ error: "Invalid country ID" });
     }
 
     const state = await State.create({ name, country: country_id });

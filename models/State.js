@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 
 const stateSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true, trim: true },
     country: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Country",
-      required: true,
+      required: false,
     },
   },
   {
