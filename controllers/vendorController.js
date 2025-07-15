@@ -60,11 +60,30 @@ export const getVendorById = async (req, res, next) => {
 };
 
 export const updateVendor = async (req, res, next) => {
+  const { state_id, country_id } = req.body;
   try {
-    const vendor = await Vendor.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const vendor = await Vendor.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, country: country_id, state: state_id },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    const countryExists = await Country.findById(country_id);
+
+    if (!countryExists) {
+      return res.status(400).json({ error: "Invalid country ID" });
+    }
+
+    if (mongoose.Types.ObjectId.isValid(state_id)) {
+      const stateExists = await State.findById(state_id);
+
+      if (!stateExists) {
+        return res.status(400).json({ error: "Invalid state ID" });
+      }
+    }
 
     if (!vendor) return res.status(404).json({ message: "Vendor not found" });
 

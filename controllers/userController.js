@@ -59,7 +59,7 @@ export const loginUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } else {
-    res.status(401).json({ message: "Invalid username or password" });
+    res.status(401).json({ message: "Invalid login credentials" });
   }
 };
 
@@ -70,5 +70,53 @@ export const getUserProfile = async (req, res) => {
     res.json(user);
   } else {
     res.status(404).json({ message: "User not found" });
+  }
+};
+
+export const updateUserProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const { firstName, lastName, email, username } = req.body;
+
+    // Optional: prevent duplicate email
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+
+      if (emailExists) {
+        return res.status(400).json({ message: "Email is already in use" });
+      }
+
+      user.email = email;
+    }
+
+    // Optional: prevent duplicate username
+    if (username && username !== user.username) {
+      const usernameExists = await User.findOne({ username });
+      if (usernameExists) {
+        return res.status(400).json({ message: "Username is already taken" });
+      }
+      user.username = username;
+    }
+
+    // Apply allowed updates
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      email: updatedUser.email,
+      username: updatedUser.username,
+      role: updatedUser.role,
+      token: generateToken(updatedUser._id, updatedUser.role), // refresh token
+    });
+  } catch (error) {
+    next(error);
   }
 };
