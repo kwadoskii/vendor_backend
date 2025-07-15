@@ -1,6 +1,6 @@
 const errorHandler = (err, req, res, next) => {
   let statusCode = 500;
-  let message = "Error";
+  let message = "Internal Server Error";
   let errors = err.message;
 
   //Validation error
