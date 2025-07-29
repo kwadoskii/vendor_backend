@@ -122,3 +122,41 @@ export const updateUserProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+export const changePassword = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Please provide current and new passwords" });
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+
+    if (!isMatch) {
+      return res.status(403).json({ message: "Current password is incorrect" });
+    }
+
+    user.password = newPassword; // Will be hashed by Mongoose hook
+    await user.save();
+
+    res.json({ message: "Password changed successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//get all users
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find().select("-password -__v");
+
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
